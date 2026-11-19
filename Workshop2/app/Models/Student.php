@@ -7,22 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-    //mass assignment
     protected $fillable = [
         'name',
-        'email', 
+        'email',
         'phone',
         'address',
-        'date_of_birth'
+        'date_of_birth',
     ];
 
-    protected $casts = [
-        'date_of_birth' => 'date:Y-m-d',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date_of_birth' => 'date',
+        ];
+    }
 
-    function age() : Attribute {
-        return Attribute::make(
-            get: fn () => $this->date_of_birth->age,
-        );
+    protected function age(): Attribute
+    {
+        return Attribute::get(fn () => $this->date_of_birth?->age);
     }
 }

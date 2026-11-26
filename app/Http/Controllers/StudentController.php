@@ -1,79 +1,47 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Student\StoreStudentRequest;
+use App\Http\Requests\Student\UpdateStudentRequest;
+use App\Http\Resources\StudentResource;
 use App\Models\Student;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
 
 class StudentController extends Controller
 {
     public function index()
     {
-        return view('student.list', [
-            'students' => Student::all(),
-        ]);
+        $students = Student::all();
+        return StudentResource::collection($students);
     }
 
-    public function create()
+    public function store(StoreStudentRequest $request)
     {
-        return view('student.create');
-    }
+        $student = Student::create($request->validated());
 
-    public function store(Request $request)
-    {
-        $student = Student::create($request->validate($this->rules()));
-
-        return redirect()
-            ->route('students.index')
-            ->with('success', "Student {$student->name} created successfully!");
+        return (new StudentResource($student))
+            ->response()
+            ->setStatusCode(201);
     }
 
     public function show(Student $student)
     {
-        return view('student.detail', [
-            'student' => $student,
-        ]);
+        return new StudentResource($student);
     }
 
-    public function edit(Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        return view('student.edit', [
-            'student' => $student,
-        ]);
+        $student->update($request->validated());
+
+        return new StudentResource($student->fresh());
     }
 
-    public function update(Request $request, Student $student)
-    {
-        $student->update($request->validate($this->rules($student)));
-
-        return redirect()
-            ->route('students.show', $student)
-            ->with('success', 'Student updated successfully!');
-    }
-
-    public function destroy(Student $student)
+    public function destroy(Student $student): JsonResponse
     {
         $student->delete();
 
-        return redirect()
-            ->route('students.index')
-            ->with('success', 'Student deleted successfully!');
-    }
-
-    private function rules(?Student $student = null): array
-    {
-        return [
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('students')->ignore($student?->id),
-            ],
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'date_of_birth' => 'nullable|date',
-        ];
+        return response()->json(null, 204);
     }
 }

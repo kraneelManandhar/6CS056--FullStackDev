@@ -17,16 +17,17 @@ class UpdateStudentRequest extends FormRequest
         $student = $this->route('student');
 
         return [
-            'name' => 'required|string|max:255',
+            'name' => ['sometimes', 'required', 'string', 'max:100'],
             'email' => [
+                'sometimes',
                 'required',
                 'email',
-                'max:255',
+                'max:256',
                 Rule::unique('students', 'email')->ignore($student?->id ?? $student),
             ],
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'date_of_birth' => 'nullable|date',
+            'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'address' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'date_of_birth' => ['sometimes', 'required', 'date'],
         ];
     }
 }

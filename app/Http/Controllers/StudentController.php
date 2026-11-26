@@ -1,47 +1,65 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
-use App\Http\Resources\StudentResource;
 use App\Models\Student;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(): View
     {
-        $students = Student::all();
-        return StudentResource::collection($students);
+        return view('student.list', [
+            'students' => Student::all(),
+        ]);
     }
 
-    public function store(StoreStudentRequest $request)
+    public function create(): View
+    {
+        return view('student.create');
+    }
+
+    public function store(StoreStudentRequest $request): RedirectResponse
     {
         $student = Student::create($request->validated());
 
-        return (new StudentResource($student))
-            ->response()
-            ->setStatusCode(201);
+        return redirect()
+            ->route('students.show', $student)
+            ->with('success', 'Student created successfully!');
     }
 
-    public function show(Student $student)
+    public function show(Student $student): View
     {
-        return new StudentResource($student);
+        return view('student.detail', [
+            'student' => $student,
+        ]);
     }
 
-    public function update(UpdateStudentRequest $request, Student $student)
+    public function edit(Student $student): View
+    {
+        return view('student.edit', [
+            'student' => $student,
+        ]);
+    }
+
+    public function update(UpdateStudentRequest $request, Student $student): RedirectResponse
     {
         $student->update($request->validated());
 
-        return new StudentResource($student->fresh());
+        return redirect()
+            ->route('students.show', $student)
+            ->with('success', 'Student updated successfully!');
     }
 
-    public function destroy(Student $student): JsonResponse
+    public function destroy(Student $student): RedirectResponse
     {
         $student->delete();
 
-        return response()->json(null, 204);
+        return redirect()
+            ->route('students.index')
+            ->with('success', 'Student deleted successfully!');
     }
 }

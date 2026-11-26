@@ -8,17 +8,17 @@ class StoreStudentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // Allows this request to proceed (change if adding role/auth checks)
+        return true;
     }
 
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:students,email',
-            'phone' => 'required|string|max:20',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:256|unique:students,email',
+            'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'date_of_birth' => 'nullable|date',
+            'date_of_birth' => 'required|date',
         ];
     }
 }

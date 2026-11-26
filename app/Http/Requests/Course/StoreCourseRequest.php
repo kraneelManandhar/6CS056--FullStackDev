@@ -14,10 +14,12 @@ class StoreCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:courses,code',
-            'description' => 'nullable|string|max:1000',
-            'credits' => 'nullable|integer|min:1',
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'duration' => ['required', 'integer', 'min:1'],
+            'fee' => ['required', 'numeric', 'min:0'],
+            'difficulty' => ['required', 'in:Easy,Medium,Hard'],
+            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 }
